@@ -1,46 +1,123 @@
 import { useRef, useEffect } from 'react';
 import { MarkersPlugin } from 'photo-sphere-viewer/dist/plugins/markers';
-import { Viewer } from 'photo-sphere-viewer';
+import 'photo-sphere-viewer/dist/plugins/virtual-tour.css';
+import { GalleryPlugin } from 'photo-sphere-viewer/dist/plugins/gallery';
+import 'photo-sphere-viewer/dist/plugins/gallery.css';
+import { VirtualTourPlugin } from 'photo-sphere-viewer/dist/plugins/virtual-tour';
+import * as PhotoSphereViewer from 'photo-sphere-viewer';
 
 export default function Index() {
   const container = useRef();
 
   useEffect(() => {
-    let viewer = new Viewer({
+    const base = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+    const viewer = new PhotoSphereViewer.Viewer({
       container: container.current,
-      panorama:
-        'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
+      loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
+      touchmoveTwoFingers: true,
+      mousewheelCtrlKey: true,
+      caption: 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>',
+      defaultLong: '100deg',
       plugins: [
-        [
-          MarkersPlugin,
-          {
-            markers: [
-              {
-                // image marker that opens the panel when clicked
-                id: 'image-1',
-                longitude: 0.32,
-                latitude: 0.11,
-                image: 'https://photo-sphere-viewer.js.org/assets/pin-red.png',
-                width: 32,
-                height: 32,
-                anchor: 'bottom center',
-                tooltip: 'A image marker. <b>Click me!</b>',
-                content: document.getElementById('lorem-content').innerHTML
-              },
-              {
-                // circle marker
-                id: 'image-2',
-                // image: 'https://photo-sphere-viewer.js.org/assets/pin-red.png',
-                circle: 20,
-                x: 2500,
-                y: 1000,
-                tooltip: 'A circle marker'
-              }
-            ],
-          },
-        ],
+        MarkersPlugin,
+        GalleryPlugin,
+        [VirtualTourPlugin, {
+          positionMode: VirtualTourPlugin.MODE_GPS,
+          renderMode: VirtualTourPlugin.MODE_MARKERS,
+        }],
       ],
+      navbar: 'zoom move download gallery caption fullscreen',
     });
+
+    const virtualTour = viewer.getPlugin(VirtualTourPlugin);
+
+    virtualTour.setNodes([
+      {
+        id: '1',
+        panorama: base + 'tour/key-biscayne-1.jpg',
+        thumbnail: base + 'tour/key-biscayne-1-thumb.jpg',
+        name: 'One',
+        links: [
+          { nodeId: '2' },
+        ],
+        markers: [
+          {
+            id: 'marker-1',
+            image: 'https://photo-sphere-viewer.js.org/assets/pin-red.png',
+            tooltip: 'Cape Florida Light, Key Biscayne',
+            width: 32,
+            height: 32,
+            anchor: 'bottom center',
+            longitude: '105deg',
+            latitude: '35deg',
+          }
+        ],
+        position: [-80.156479, 25.666725, 3],
+        panoData: { poseHeading: 327 },
+      },
+      {
+        id: '2',
+        panorama: base + 'tour/key-biscayne-2.jpg',
+        thumbnail: base + 'tour/key-biscayne-2-thumb.jpg',
+        name: 'Two',
+        links: [
+          { nodeId: '3' },
+          { nodeId: '1' },
+        ],
+        position: [-80.156168, 25.666623, 3],
+        panoData: { poseHeading: 318 },
+      },
+      {
+        id: '3',
+        panorama: base + 'tour/key-biscayne-3.jpg',
+        thumbnail: base + 'tour/key-biscayne-3-thumb.jpg',
+        name: 'Three',
+        links: [
+          { nodeId: '4' },
+          { nodeId: '2' },
+          { nodeId: '5' },
+        ],
+        position: [-80.155932, 25.666498, 5],
+        panoData: { poseHeading: 328 },
+      },
+      {
+        id: '4',
+        panorama: base + 'tour/key-biscayne-4.jpg',
+        thumbnail: base + 'tour/key-biscayne-4-thumb.jpg',
+        name: 'Four',
+        links: [
+          { nodeId: '3' },
+          { nodeId: '5' },
+        ],
+        position: [-80.156089, 25.666357, 3],
+        panoData: { poseHeading: 78 },
+      },
+      {
+        id: '5',
+        panorama: base + 'tour/key-biscayne-5.jpg',
+        thumbnail: base + 'tour/key-biscayne-5-thumb.jpg',
+        name: 'Five',
+        links: [
+          { nodeId: '6' },
+          { nodeId: '3' },
+          { nodeId: '4' },
+        ],
+        position: [-80.156292, 25.666446, 2],
+        panoData: { poseHeading: 190 },
+      },
+      {
+        id: '6',
+        panorama: base + 'tour/key-biscayne-6.jpg',
+        thumbnail: base + 'tour/key-biscayne-6-thumb.jpg',
+        name: 'Six',
+        links: [
+          { nodeId: '5' },
+        ],
+        position: [-80.156465, 25.666496, 2],
+        panoData: { poseHeading: 328 },
+      },
+    ], '2');
 
     return () => {
       viewer.destroy();
@@ -49,37 +126,7 @@ export default function Index() {
 
   return (
     <>
-      <div ref={container} style={{ width: '100vw', height: '100vh' }} />
-      <div style={{display: "none"}} id="lorem-content">
-        <h1>HTML Ipsum Presents</h1>
-
-        <p><strong>Pellentesque habitant morbi tristique</strong> senectus et netus et malesuada fames ac turpis egestas.
-          Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam
-          egestas semper. <em>Aenean ultricies mi vitae est.</em> Mauris placerat eleifend leo. Quisque sit amet est et
-          sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, <code>commodo vitae</code>, ornare sit amet,
-          wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac
-          dui. <a href="#">Donec non enim</a> in turpis pulvinar facilisis. Ut felis.</p>
-
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d54469.108394396746!2d6.9617553450295855!3d44.151844842645815!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12cdaf6678af879d%3A0xcabc15aee7b89386!2sParc%20national%20du%20Mercantour!5e0!3m2!1sfr!2sfr!4v1611498421096!5m2!1sfr!2sfr" width="100%" height="300" frameBorder="0" style={{ border: 0 }} allowFullScreen="" aria-hidden="false" tabIndex="0"></iframe>
-
-        <h2>Header Level 2</h2>
-
-        <ol>
-          <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
-          <li>Aliquam tincidunt mauris eu risus.</li>
-        </ol>
-
-        <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna. Cras in mi at felis aliquet
-          congue. Ut a est eget ligula molestie gravida. Curabitur massa. Donec eleifend, libero at sagittis mollis,
-          tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretium ornare est.</p></blockquote>
-
-        <h3>Header Level 3</h3>
-
-        <ul>
-          <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
-          <li>Aliquam tincidunt mauris eu risus.</li>
-        </ul>
-      </div>
+      <div id="container" ref={container} style={{ width: '100vw', height: '100vh' }} />
     </>
   );
 }
